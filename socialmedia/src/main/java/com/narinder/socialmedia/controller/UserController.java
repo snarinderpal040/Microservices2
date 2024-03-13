@@ -1,10 +1,7 @@
 package com.narinder.socialmedia.controller;
 
 import java.net.URI;
-import java.util.List;
 
-import com.narinder.socialmedia.entities.User;
-import com.narinder.socialmedia.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.narinder.socialmedia.dto.UserDTO;
+import com.narinder.socialmedia.services.UserService;
 
 import jakarta.validation.Valid;
 
@@ -31,32 +29,28 @@ public class UserController {
 		return service.hello();
 	}
 	
-	@GetMapping("users")
-	public List<User> allUsers(){
-		return service.findAll();
-	}
 	
 	@PostMapping("users")
-	public ResponseEntity<User> addUser(@Valid @RequestBody User user) {
-		User save = service.save(user);
+	public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO userDTO) {
+		UserDTO save = service.save(userDTO);
 		
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()
 				.path("/{id}")
-				.buildAndExpand(save.getId())
+				.buildAndExpand(save.getName())
 				.toUri();
 		
-		return ResponseEntity.created(location).build();
+		return ResponseEntity.created(location).body(save);
 	}
 	
 	@GetMapping("users/{id}")
-	public User getUserById(@PathVariable int id) {
-		return service.findById(id);
+	public ResponseEntity<UserDTO> getUserById(@PathVariable String name) {
+		return new ResponseEntity<UserDTO>(service.findById(name), HttpStatus.OK);
 	}
 	
 	@DeleteMapping(value = "users/{id}")
-	public String deleteById(@PathVariable int id) {
-		return service.deleteById(id);
+	public String deleteById(@PathVariable String name) {
+		return service.deleteById(name);
 	}
 	
 	@GetMapping(value = "users/posts/{username}")

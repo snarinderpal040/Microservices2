@@ -3,12 +3,15 @@ package com.narinder.socialmedia.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
+
 public class UserDTO {
-	
-	private Integer id;
-	
+		
+	@Size(min = 3, message = "name should be atleast 3 characters long")
 	private String name;
 	
+	@Past(message = "Birth date should be in the past")
 	private LocalDate birthdate;
 	
 	private List<PostDTO> post;
@@ -16,21 +19,18 @@ public class UserDTO {
 	public UserDTO() {
 		
 	}
+	
+	public UserDTO(String name, LocalDate birthDate) {
+		this.name = name;
+		this.birthdate = birthDate;
+	}
 
-	public UserDTO(Integer id, String name, LocalDate birthdate, List<PostDTO> post) {
-		this.id = id;
+	public UserDTO(String name, LocalDate birthdate, List<PostDTO> post) {
 		this.name = name;
 		this.birthdate = birthdate;
 		this.post = post;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;
@@ -58,7 +58,7 @@ public class UserDTO {
 
 	@Override
 	public String toString() {
-		return "UserDTO [id=" + id + ", name=" + name + ", birthdate=" + birthdate + ", post=" + post + "]";
+		return "UserDTO [name=" + name + ", birthdate=" + birthdate + ", post=" + post + "]";
 	}
 
 }

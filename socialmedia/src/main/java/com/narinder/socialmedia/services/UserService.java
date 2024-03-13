@@ -31,37 +31,44 @@ public class UserService {
 	@Autowired
 	private Config config;
 	
+	public UserDTO userToUserDto(User user) {
+		UserDTO uDto = new UserDTO();
+		uDto.setBirthdate(user.getBirthdate());
+		uDto.setName(user.getName());
+		return uDto;
+	}
+	
+	public User userDtoToUser(UserDTO userDTO) {
+		return new User(userDTO.getName(), userDTO.getBirthdate());
+	}
+	
 	
 	public UserDTO getPostsByUsername(String username) {
 		User user = repo.findByName(username);
-
-		UserDTO uDto = new UserDTO();
-		uDto.setId(user.getId());
-		uDto.setBirthdate(user.getBirthdate());
-		uDto.setName(user.getName());
+		UserDTO userDTO = userToUserDto(user);
 		
 		@SuppressWarnings("unchecked")
 		List<PostDTO> posts = restTemplate.getForObject(config.getUrl() + "/posts/" + username, List.class);
-		uDto.setPost(posts);
+		userDTO.setPost(posts);
 		
-		return uDto;
+		return userDTO;
 	}
 
-	public List<User> findAll() {
-		return repo.findAll();
+	public UserDTO save(UserDTO userDTO) {
+		User user = userDtoToUser(userDTO);
+		User savedUser = repo.save(user);
+		UserDTO userDTO2 = userToUserDto(savedUser);
+		return userDTO2;
 	}
 
-	public User save(User user) {
-		return repo.save(user);
+	public UserDTO findById(String name) {
+		User user = repo.findById(name).orElseThrow(() -> new UserNotFoundException("User not found with name : " + name));
+		return userToUserDto(user);
 	}
 
-	public User findById(int id) {
-		return repo.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id : " + id));
-	}
-
-	public String deleteById(int id) {
-		repo.deleteById(id);
-		return "user deleted with id : " + id;
+	public String deleteById(String name) {
+		repo.deleteById(name);
+		return "user deleted with name : " + name;
 	}
 	
 	@Retry(name = "default", fallbackMethod = "hardCodedValue")
